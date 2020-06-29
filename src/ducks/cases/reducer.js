@@ -1,17 +1,26 @@
 import casesTypes from 'ducks/cases/types';
 
 const initialState = {
-  activeCase: null,
+  activeCases: null,
   cases: null,
   status: '',
   error: null,
   record: null,
-  externalId: null,
+  externalId: '',
   accessCode: null,
+  updateExtIDError: null,
 };
 
 export default function reducer(state = initialState, action) {
-  const { type, status, data, caseId, accessCode, externalId } = action;
+  const {
+    type,
+    status,
+    data,
+    caseId,
+    accessCode,
+    externalId,
+    updateExtIDError,
+  } = action;
   switch (type) {
     case casesTypes.STATUS:
       return { ...state, status: status };
@@ -23,12 +32,17 @@ export default function reducer(state = initialState, action) {
     case casesTypes.ADD_CASE:
       return {
         ...state,
-        activeCase: data,
+        activeCases: data,
       };
     case casesTypes.SET_ACTIVE_CASE:
       return {
         ...state,
-        activeCase: caseId,
+        activeCases: caseId,
+      };
+    case casesTypes.SET_EXTERNAL_ID:
+      return {
+        ...state,
+        externalId,
       };
     case casesTypes.SET_ACCESS_CODE:
       return {
@@ -44,11 +58,25 @@ export default function reducer(state = initialState, action) {
         },
       };
     }
-    case casesTypes.UPDATE_EXTERNAL_ID: {
+    case casesTypes.externalID.REQUEST: {
       return {
         ...state,
-        externalId
-      }
+        fetching: true,
+      };
+    }
+    case casesTypes.externalID.SUCCESS: {
+      return {
+        ...state,
+        fetching: false,
+        externalId,
+      };
+    }
+    case casesTypes.externalID.FAILURE: {
+      return {
+        ...state,
+        fetching: false,
+        error: updateExtIDError,
+      };
     }
     default:
       return state;

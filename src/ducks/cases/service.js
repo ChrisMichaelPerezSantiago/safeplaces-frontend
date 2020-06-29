@@ -33,6 +33,18 @@ const casesService = {
 
     return axios(request);
   },
+  enrichCase: ({ accessCode, caseId }) => {
+    const request = {
+      method: 'POST',
+      url: `${REACT_APP_API_URL}case/points/ingest`,
+      data: {
+        accessCode,
+        caseId,
+      },
+    };
+
+    return axios(request);
+  },
   fetchMultiPoints: ({ data }) => {
     return axios({
       method: 'POST',
@@ -41,17 +53,9 @@ const casesService = {
     });
   },
   deleteCase: ({ caseId }) => {
-    console.log({
-      method: 'DELETE',
-      url: `${REACT_APP_API_URL}case`,
-      data: {
-        caseId,
-      },
-    });
-
     return axios({
-      method: 'DELETE',
-      url: `${REACT_APP_API_URL}case`,
+      method: 'POST',
+      url: `${REACT_APP_API_URL}case/delete`,
       data: {
         caseId,
       },
@@ -76,7 +80,7 @@ const casesService = {
     });
   },
   updateExternalCaseId: async ({ caseId, externalId }) => {
-    const res = await axios({
+    return await axios({
       method: 'PUT',
       url: `${REACT_APP_API_URL}case`,
       data: {
@@ -84,7 +88,6 @@ const casesService = {
         externalId,
       },
     });
-    return res;
   },
 };
 

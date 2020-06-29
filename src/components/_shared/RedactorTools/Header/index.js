@@ -1,83 +1,122 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { useDispatch } from 'react-redux'
-import { redactorToolsHeader, selectedfaEllipsisVIcon, ModalButton, inputtext } from './header.module.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  redactorToolsHeader,
+  selectedEditContextMenu,
+  selectedEditContextMenuAction,
+  selectedfaEllipsisVIcon,
+} from './header.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faEllipsisV } from '@fortawesome/pro-solid-svg-icons';
-import { Button, TextInput } from '@wfp/ui'
-import Modal from '../../../_global/Modal';
-import Dialog from '../../../_shared/Dialog';
+import {
+  faChevronLeft,
+  faEdit,
+  faEllipsisV,
+} from '@fortawesome/pro-solid-svg-icons';
 import casesSelectors from 'ducks/cases/selectors';
 import caseAction from 'ducks/cases/actions';
-import { useSelector } from 'react-redux';
+import EditRecordModal from './EditRecordModal';
+import applicationSelectors from 'ducks/application/selectors';
+import { useOnClickOutside } from 'hooks/useOnClickOutside';
 
-const RedactorToolsHeader = ({ currentRecord }) => {
+const RedactorToolsHeader = () => {
   const dispatch = useDispatch();
-  const activeCase = useSelector(state => casesSelectors.getActiveCase(state));
+  const containerRef = useRef();
+  const activeCases = useSelector(state =>
+    casesSelectors.getActiveCases(state),
+  );
+  const externalId = useSelector(state => casesSelectors.getExternalId(state));
+  const mode = useSelector(state => applicationSelectors.getMode(state));
   const [showModal, setShowModal] = useState(false);
-  const [externalInpuValue, setInputValue] = useState("");
+  const [showEditRecordButton, setEditRecordButton] = useState(false);
+  const [externalInputValue, setInputValue] = useState('');
 
-  const handleBack = () => console.log('go back');
-  const onChangeHandler = (event) => {
+  useOnClickOutside(containerRef, () => setEditRecordButton(false));
+
+  const onChangeHandler = event => {
     setInputValue(event.target.value);
   };
 
-  const onSubmit = () => {
-    if (activeCase) {
-      dispatch(caseAction.updExternalCaseId(externalInpuValue));
+  const onSubmit = async () => {
+    if (activeCases) {
+      dispatch(caseAction.updExternalCaseIdRequest(externalInputValue));
+      setShowModal(false);
     }
   };
 
-  if (!activeCase) {
+  if (!activeCases) {
     return null;
   }
 
+  const _id = activeCases.externalId || activeCases.caseId;
+
+  const EditRecordButton = () => (
+    <div className={selectedEditContextMenu}>
+      <ul>
+        <li>
+          <button
+            id="edit-record-id"
+            className={selectedEditContextMenuAction}
+            type="button"
+            onClick={() => {
+              setShowModal(true);
+              setEditRecordButton(false);
+            }}
+          >
+            <FontAwesomeIcon icon={faEdit} />
+            Edit Record ID
+          </button>
+        </li>
+      </ul>
+    </div>
+  );
+
   return (
     <>
-      <header className={redactorToolsHeader}>
-        {/* <button type="button" onClick={handleBack} title="Back to home screen">
-        <FontAwesomeIcon icon={faChevronLeft} />
-      </button> */}
-        <h3>Record ID: {activeCase}</h3>
+      <header className={redactorToolsHeader} ref={containerRef}>
         <button
-          className={selectedfaEllipsisVIcon}
-          onClick={() => setShowModal(true)}
+          id="go-back"
           type="button"
+          onClick={() =>
+            dispatch({
+              type: 'RESET_VIEW',
+            })
+          }
+          title="Back to home screen"
         >
-          <FontAwesomeIcon icon={faEllipsisV} />
+          <FontAwesomeIcon icon={faChevronLeft} />
         </button>
+        <h3 title={externalId || ''}>
+          {Array.isArray(activeCases) ? (
+            <>
+              {activeCases.length} Record{activeCases.length > 1 ? 's' : ''}{' '}
+              Loaded
+            </>
+          ) : (
+              <>Record ID: {_id}</>
+            )}
+        </h3>
+        {mode === 'trace' && (
+          <button
+            id="more-menu-button"
+            className={selectedfaEllipsisVIcon}
+            onClick={() => setEditRecordButton(true)}
+            type="button"
+          >
+            <FontAwesomeIcon icon={faEllipsisV} />
+          </button>
+        )}
+        {showEditRecordButton && <EditRecordButton />}
       </header>
-      {showModal && (
-        <Modal>
-          <Dialog width="650px">
-            <header>
-              <h3>Edit Record ID</h3>
-              <p>
-                If you are using a System to manage your patients and already
-                have an ID for this patient, please enter it
-              </p>
-            </header>
-            <TextInput
-              className={inputtext}
-              placeholder="Enter A Record ID"
-              onChange={onChangeHandler}
-              value={externalInpuValue}
-            />
-            <Button type="button" className={ModalButton} onClick={onSubmit}>
-              Save Record ID
-            </Button>
-            <br />
-            <Button
-              type="button"
-              className={ModalButton}
-              onClick={() => setShowModal(false)}
-            >
-              Cancel
-            </Button>
-          </Dialog>
-        </Modal>
-      )}
+
+      <EditRecordModal
+        onSubmit={onSubmit}
+        externalInputValue={externalInputValue}
+        onChangeHandler={onChangeHandler}
+        setShowModal={setShowModal}
+        showModal={showModal}
+      />
     </>
   );
 };

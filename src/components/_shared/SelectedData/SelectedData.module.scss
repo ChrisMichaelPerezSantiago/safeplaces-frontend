@@ -1,14 +1,12 @@
 .selectedDataWrapper {
   position: relative;
-  overflow: auto;
-  height: 100%;
 }
 
 .selectedDataHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   position: relative;
 }
 
@@ -23,7 +21,6 @@
   min-height: 200px;
   overflow: auto;
   border-radius: 6px;
-  background-color: #fff;
   margin-bottom: 20px;
 }
 
@@ -39,4 +36,17 @@
   background: none;
   outline: none;
   border: none;
+}
+
+.clearFilters {
+  color: #2434b6;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-height: 827px) {
+  .selectedDataList {
+    max-height: 30vh;
+  }
 }

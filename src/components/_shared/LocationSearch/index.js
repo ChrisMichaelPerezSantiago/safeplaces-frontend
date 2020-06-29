@@ -33,7 +33,7 @@ const LocationSearchInput = ({ handlePointChange, defaultValue }) => {
 
   useEffect(() => {
     selectedLocation?.longitude &&
-      setValue(`${selectedLocation?.longitude}, ${selectedLocation?.latitude}`);
+      setValue(`${selectedLocation?.latitude}, ${selectedLocation?.longitude}`);
   }, []);
 
   return (
@@ -45,12 +45,14 @@ const LocationSearchInput = ({ handlePointChange, defaultValue }) => {
       {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
         <div className={locationSearch}>
           <input
+            id="search-location"
             style={{
               width: '100%',
             }}
             {...getInputProps({
               placeholder: 'Search Location',
             })}
+            required
           />
           {suggestions?.length > 0 && (
             <LocationSuggestions

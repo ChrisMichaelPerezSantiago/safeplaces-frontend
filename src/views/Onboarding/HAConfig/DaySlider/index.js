@@ -3,7 +3,7 @@ import Slider from 'rc-slider';
 import styles from './styles.module.scss';
 
 const DaySlider = ({ id, handleChange, value }) => {
-  const [day, setDay] = useState(value || 0);
+  const [day, setDay] = useState(value || 14);
 
   const onChange = d => {
     setDay(d);
@@ -14,7 +14,7 @@ const DaySlider = ({ id, handleChange, value }) => {
   }, [day]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="day-slider">
       <Slider
         ariaLabelForHandle={day}
         min={0}

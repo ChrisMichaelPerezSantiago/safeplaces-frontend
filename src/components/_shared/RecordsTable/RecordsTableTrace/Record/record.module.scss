@@ -1,6 +1,7 @@
 .record {
   width: 100%;
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+  line-height: 1.2;
 
   &:last-of-type {
     border: none;
@@ -16,8 +17,12 @@
   font-size: 18px;
   padding: 0;
   border-bottom: 1px solid #2434b6;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
 }
 
-.unpublished {
+.staged {
   font-style: italic;
 }
